@@ -11,11 +11,19 @@ public enum AddedValueEnum {
     FRESHNESS_AGGREGATED,
     POPULARITY_1_YEAR,
     POPULARITY_1_YEAR_AGGREGATED,
-    SPEED;
+    SPEED,
+    GITHUB,
+    POPULARITYDEPENDENCY,
+    SBOMSYFTECRASE,
+    SBOMSYFTALL,
+    SBOMSYFT/*,
+    SBOMSMP,
+    SBOMSMPECRASE,
+    SBOMSMPALL*/;
 
     public NodeType getTargetNodeType(){
         return switch (this) {
-            case CVE, CVE_AGGREGATED, FRESHNESS, FRESHNESS_AGGREGATED, POPULARITY_1_YEAR, POPULARITY_1_YEAR_AGGREGATED -> NodeType.RELEASE;
+            case CVE, CVE_AGGREGATED, FRESHNESS, FRESHNESS_AGGREGATED, POPULARITY_1_YEAR, POPULARITY_1_YEAR_AGGREGATED, GITHUB, POPULARITYDEPENDENCY, SBOMSYFTECRASE, SBOMSYFTALL, SBOMSYFT/* , SBOMSMP, SBOMSMPECRASE, SBOMSMPALL*/ -> NodeType.RELEASE;
             case SPEED -> NodeType.ARTIFACT;
         };
     }
@@ -29,6 +37,14 @@ public enum AddedValueEnum {
             case POPULARITY_1_YEAR -> Popularity1Year.class;
             case POPULARITY_1_YEAR_AGGREGATED -> Popularity1YearAggregated.class;
             case SPEED -> Speed.class;
+            case GITHUB -> Github.class;
+            case POPULARITYDEPENDENCY -> PopularityDependency.class;
+            case SBOMSYFTECRASE -> SbomSyftEcrase.class;
+            case SBOMSYFT -> SbomSyft.class;
+            case SBOMSYFTALL -> SbomSyftAll.class;
+            //case SBOMSMPECRASE -> SbomSmpEcrase.class;
+            //case SBOMSMP -> SbomSmp.class;
+            //case SBOMSMPALL -> SbomSmpAll.class;
         };
     }
 

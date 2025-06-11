@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class GraphController {
             summary = "Creates a graph by traversing from a root"
     )
     @PostMapping("/graph/traversing")
-    public JSONObject traversingGraph(@RequestBody GraphTraversingQuery graphTraversingQuery) {
+    public JSONObject traversingGraph(@RequestBody GraphTraversingQuery graphTraversingQuery) throws IOException, InterruptedException {
         // Create root node and its dependencies
         InternGraph resultGraph = new InternGraph();
         resultGraph.addNode(new ReleaseNode("ROOT", "ROOT", 0, ""));
@@ -104,7 +105,7 @@ public class GraphController {
             summary = "Get the project rooted all graph from releases dependencies list"
     )
     @PostMapping("/graph/rootedGraph")
-    public JSONObject getRootedGraph(@RequestBody ReleaseQueryList releaseQueryList) {
+    public JSONObject getRootedGraph(@RequestBody ReleaseQueryList releaseQueryList) throws IOException, InterruptedException {
         InternGraph resultGraph = new InternGraph();
         resultGraph.addNode(new ReleaseNode("ROOT", "ROOT", 0, ""));
         for (ReleaseQueryList.Release release : releaseQueryList.getReleases()) {
@@ -126,7 +127,7 @@ public class GraphController {
             summary = "Get the project rooted direct dependencies possibilities graph from releases dependencies list"
     )
     @PostMapping("/graph/directPossibilitiesRooted")
-    public JSONObject getDirectPossibilitiesRootedGraph(@RequestBody ReleaseQueryList releaseQueryList) {
+    public JSONObject getDirectPossibilitiesRootedGraph(@RequestBody ReleaseQueryList releaseQueryList) throws IOException, InterruptedException {
         InternGraph resultGraph = new InternGraph();
         resultGraph.addNode(new ReleaseNode("ROOT", "ROOT", 0, ""));
         for (ReleaseQueryList.Release release : releaseQueryList.getReleases()) {

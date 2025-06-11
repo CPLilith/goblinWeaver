@@ -6,6 +6,9 @@ import com.cifre.sap.su.goblinWeaver.graphEntities.InternGraph;
 import com.cifre.sap.su.goblinWeaver.weaver.Weaver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.io.IOException;
+
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +21,7 @@ public class CypherController {
             summary = "Execute a cypher query"
     )
     @PostMapping("/cypher")
-    public JSONObject executeCypherQuery(@RequestBody CypherQuery queryRequest) {
+    public JSONObject executeCypherQuery(@RequestBody CypherQuery queryRequest) throws IOException, InterruptedException {
         InternGraph graph = GraphDatabaseSingleton.getInstance().executeQuery(queryRequest.getQuery());
         Weaver.weaveGraph(graph, queryRequest.getAddedValues());
         return graph.getJsonGraph();

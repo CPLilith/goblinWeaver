@@ -6,13 +6,14 @@ import com.cifre.sap.su.goblinWeaver.graphEntities.nodes.NodeObject;
 import com.cifre.sap.su.goblinWeaver.graphEntities.nodes.NodeType;
 import com.cifre.sap.su.goblinWeaver.weaver.addedValue.*;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Weaver {
 
-    public static void weaveGraph (InternGraph graph, Set<AddedValueEnum> addedValues){
+    public static void weaveGraph (InternGraph graph, Set<AddedValueEnum> addedValues) throws IOException, InterruptedException{
         if(addedValues.isEmpty()){
             return;
         }
@@ -46,12 +47,35 @@ public class Weaver {
         return batches;
     }
 
-    private static List<AddedValue<?>> fillNodeAddedValues(List<NodeObject> nodes, Set<AddedValueEnum> nodeTypeAddedValues, Map<String,Map<AddedValueEnum,String>> resolvedNodeAddedValues) {
+    private static List<AddedValue<?>> fillNodeAddedValues(List<NodeObject> nodes, Set<AddedValueEnum> nodeTypeAddedValues, Map<String,Map<AddedValueEnum,String>> resolvedNodeAddedValues) throws IOException, InterruptedException {
         List<AddedValue<?>> computedAddedValues = new ArrayList<>();
         for (NodeObject node : nodes){
             for (AddedValueEnum addedValueEnum : nodeTypeAddedValues) {
                 try {
+                    
                     AddedValue<?> addedValue = addedValueEnum.getAddedValueClass().getDeclaredConstructor(String.class).newInstance(node.getId());
+                    
+                    if (addedValueEnum == AddedValueEnum.SBOMSYFTECRASE /*|| addedValueEnum == AddedValueEnum.SBOMSMPECRASE*/) {
+                        addedValue.computeValue();
+                        if (!addedValueEnum.isAggregatedValue()) {
+                            computedAddedValues.add(addedValue);
+                        }
+                        node.addAddedValue(addedValue);
+                        break;
+                    }
+
+                    if (addedValueEnum == AddedValueEnum.SBOMSYFTALL /*|| addedValueEnum == AddedValueEnum.SBOMSMPALL*/) {
+                        
+                        addedValue.computeValue();
+
+                        if (!addedValueEnum.isAggregatedValue()) {
+                            computedAddedValues.add(addedValue);
+                        }
+                        
+                        node.addAddedValue(addedValue);
+                        break;
+                    }
+
                     // If addedValue is present on graph
                     if (resolvedNodeAddedValues.containsKey(node.getId()) && resolvedNodeAddedValues.get(node.getId()).containsKey(addedValueEnum)) {
                         addedValue.setValue(resolvedNodeAddedValues.get(node.getId()).get(addedValueEnum));
@@ -62,6 +86,7 @@ public class Weaver {
                             computedAddedValues.add(addedValue);
                         }
                     }
+
                     node.addAddedValue(addedValue);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     e.printStackTrace();
@@ -72,7 +97,7 @@ public class Weaver {
         return computedAddedValues;
     }
 
-    private static List<AddedValue<?>> fillNodeAddedValuesOld(InternGraph graph, Set<AddedValueEnum> nodeTypeAddedValues, Map<String,Map<AddedValueEnum,String>> resolvedNodeAddedValues, NodeType nodeType) {
+    private static List<AddedValue<?>> fillNodeAddedValuesOld(InternGraph graph, Set<AddedValueEnum> nodeTypeAddedValues, Map<String,Map<AddedValueEnum,String>> resolvedNodeAddedValues, NodeType nodeType) throws IOException, InterruptedException {
         List<AddedValue<?>> computedAddedValues = new ArrayList<>();
         for (NodeObject node : graph.getGraphNodes().stream().filter(node -> node.getType().equals(nodeType)).collect(Collectors.toSet())){
             String nodeId = node.getId();

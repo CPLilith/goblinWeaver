@@ -14,4 +14,7 @@ public interface QueryDictionary {
     String getReleaseDirectCompileDependenciesEdgeAndArtifact(String artifactId);
     String getLastReleaseTimestamp();
     String getDependencyGraphFromReleaseIdListParameter();
+    String getGithubMetrics(String nodeId);
+    String getPopularityDependency(String nodeId);
+    String getSbomValue(String nodeId);
 }

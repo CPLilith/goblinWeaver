@@ -142,24 +142,49 @@ public class Neo4jGraphDatabase implements GraphDatabaseInterface {
             Transaction tx = session.beginTransaction();
             int batch = 0;
             Map<String, Object> parameters = new HashMap<>();
-            for(AddedValue addedValue : computedAddedValues){
+            Set<String> cleanedNodes = new HashSet<>();
+
+            for (AddedValue addedValue : computedAddedValues) {
+                String sourceId = addedValue.getNodeId();
+                String targetLabel = addedValue.getAddedValueEnum().getTargetNodeType().enumToLabel();
+
+                // Nettoyer une seule fois par sourceId
+                if (!cleanedNodes.contains(sourceId)) {
+                    parameters.clear();
+                    parameters.put("sourceId", sourceId);
+                    tx.run(
+                        "MATCH (r:" + targetLabel + " {id: $sourceId})-[:addedValues]->(v:AddedValue) " +
+                        "DETACH DELETE v",
+                        parameters
+                    );
+                    cleanedNodes.add(sourceId);
+                }
+
+                // Ajouter la nouvelle valeur
                 batch++;
                 parameters.clear();
-                parameters.put("sourceId",addedValue.getNodeId());
-                parameters.put("addedValueId",addedValue.getNodeId()+":"+addedValue.getAddedValueEnum().toString());
+                parameters.put("sourceId", sourceId);
+                parameters.put("addedValueId", sourceId + ":" + addedValue.getAddedValueEnum().toString());
                 parameters.put("addedValueType", addedValue.getAddedValueEnum().toString());
                 parameters.put("value", addedValue.valueToString(addedValue.getValue()));
-                tx.run("MATCH (r:"+addedValue.getAddedValueEnum().getTargetNodeType().enumToLabel()+" {id: $sourceId}) CREATE (r)-[l:addedValues]->(v:AddedValue {id: $addedValueId, type: $addedValueType, value: $value})", parameters);
-                if(batch % 10000 == 0){
+                tx.run(
+                    "MATCH (r:" + targetLabel + " {id: $sourceId}) " +
+                    "CREATE (r)-[:addedValues]->(v:AddedValue {id: $addedValueId, type: $addedValueType, value: $value})",
+                    parameters
+                );
+
+                if (batch % 10000 == 0) {
                     tx.commit();
                     tx.close();
                     tx = session.beginTransaction();
+                    cleanedNodes.clear(); // Important pour les nouveaux lots
                 }
             }
+
             tx.commit();
             tx.close();
         } catch (Exception e) {
-            System.out.println("Fail to add added values:\n"+e.getMessage());
+            System.out.println("Fail to add added values:\n" + e.getMessage());
         }
     }
 

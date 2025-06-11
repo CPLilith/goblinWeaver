@@ -112,4 +112,21 @@ public class Neo4jQueryDictionary implements QueryDictionary {
                 "WHERE r.id IN $releaseIdList AND d.scope = 'compile' AND r2.version = d.targetVersion " +
                 "RETURN d,a,e,r2";
     }
+
+    @Override
+    public String getGithubMetrics(String nodeId) {
+        return "MATCH (r:Release {id: '" + nodeId + "'}) " +
+               "WITH [k IN keys(r) WHERE toString(r[k]) CONTAINS 'github.com' | r[k]] AS githubLinks " +
+               "RETURN githubLinks AS url";
+    }
+
+    @Override
+    public String getPopularityDependency(String nodeid) {
+        return "MATCH p=(n:Release)-[r:dependency]->(m:Artifact)" +
+                "WHERE n.id = '"+nodeid+"' RETURN count(m) as numberPopularityDependency";
+    }
+
+    public String getSbomValue(String nodeId){
+        return "MATCH (n:AddedValue) WHERE n.id = '"+nodeId+"' AND n.type = \"SBOMSYFTALL\" RETURN n.value ";
+    }
 }

@@ -5,6 +5,7 @@ import com.cifre.sap.su.goblinWeaver.weaver.addedValue.AddedValue;
 import org.json.simple.JSONObject;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,6 +31,10 @@ public abstract class NodeObject implements GraphObject {
 
     public String getNeo4jId() {
         return neo4jId;
+    }
+
+    public Set<AddedValue> getAddedValues() {
+        return addedValues;
     }
 
     public void addAddedValue(AddedValue addedValue){
@@ -58,4 +63,5 @@ public abstract class NodeObject implements GraphObject {
     public int hashCode() {
         return Objects.hash(neo4jId);
     }
+
 }

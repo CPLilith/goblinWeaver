@@ -7,6 +7,9 @@ import com.cifre.sap.su.goblinWeaver.graphEntities.InternGraph;
 import com.cifre.sap.su.goblinWeaver.weaver.Weaver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.io.IOException;
+
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +24,7 @@ public class ReleaseController {
             summary = "Get a specific release from GAV"
     )
     @PostMapping("/release")
-    public JSONObject getSpecificRelease(@RequestBody ReleaseQuery releaseQuery) {
+    public JSONObject getSpecificRelease(@RequestBody ReleaseQuery releaseQuery) throws IOException, InterruptedException {
         GraphDatabaseInterface gdb = GraphDatabaseSingleton.getInstance();
         InternGraph graph = gdb.executeQuery(gdb.getQueryDictionary().getSpecificRelease(releaseQuery.toString()));
         Weaver.weaveGraph(graph, releaseQuery.getAddedValues());
@@ -33,7 +36,7 @@ public class ReleaseController {
             summary = "Get newer versions of a release from GAV"
     )
     @PostMapping("/release/newVersions")
-    public JSONObject getNewerReleases(@RequestBody ReleaseQuery releaseQuery) {
+    public JSONObject getNewerReleases(@RequestBody ReleaseQuery releaseQuery) throws IOException, InterruptedException {
         GraphDatabaseInterface gdb = GraphDatabaseSingleton.getInstance();
         InternGraph graph = gdb.executeQuery(gdb.getQueryDictionary().getNewerReleases(releaseQuery.toString(), releaseQuery.getGa()));
         Weaver.weaveGraph(graph, releaseQuery.getAddedValues());
@@ -45,7 +48,7 @@ public class ReleaseController {
             summary = "Get release dependents from GAV"
     )
     @PostMapping("/release/dependents")
-    public JSONObject getReleaseDependent(@RequestBody ReleaseQuery releaseQuery) {
+    public JSONObject getReleaseDependent(@RequestBody ReleaseQuery releaseQuery) throws IOException, InterruptedException {
         GraphDatabaseInterface gdb = GraphDatabaseSingleton.getInstance();
         InternGraph graph = gdb.executeQuery(gdb.getQueryDictionary().getReleaseDependent(releaseQuery.getGa(), releaseQuery.getVersion()));
         Weaver.weaveGraph(graph, releaseQuery.getAddedValues());
